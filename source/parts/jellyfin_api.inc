@@ -1327,11 +1327,11 @@ static void build_items_page_path(char *path, size_t pathsz, const char *enc_par
 {
     if (user_endpoint) {
         snprintf(path, pathsz,
-                 "/Users/%s/Items?ParentId=%s&StartIndex=%d&Limit=%d&Recursive=false&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount&IsMissing=false&IsUnaired=false",
+                 "/Users/%s/Items?ParentId=%s&StartIndex=%d&Limit=%d&Recursive=false&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount",
                  g_cfg.user_id, enc_parent, start, limit);
     } else {
         snprintf(path, pathsz,
-                 "/Items?UserId=%s&ParentId=%s&StartIndex=%d&Limit=%d&Recursive=false&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount&IsMissing=false&IsUnaired=false",
+                 "/Items?UserId=%s&ParentId=%s&StartIndex=%d&Limit=%d&Recursive=false&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount",
                  g_cfg.user_id, enc_parent, start, limit);
     }
 }
@@ -1339,7 +1339,7 @@ static void build_items_page_path(char *path, size_t pathsz, const char *enc_par
 static void build_series_seasons_page_path(char *path, size_t pathsz, const char *enc_series, int start, int limit)
 {
     snprintf(path, pathsz,
-             "/Shows/%s/Seasons?userId=%s&StartIndex=%d&Limit=%d&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount&IsMissing=false&IsUnaired=false",
+             "/Shows/%s/Seasons?userId=%s&StartIndex=%d&Limit=%d&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount",
              enc_series, g_cfg.user_id, start, limit);
 }
 
@@ -1446,6 +1446,9 @@ static bool load_items_for_media_item(const MediaItem *item)
         return false;
     }
     const char *series_id = item->series_id[0] ? item->series_id : "";
+    if (!series_id[0] && strcmp(item->type, "Season") == 0 && strcmp(g_current_parent_type, "Series") == 0) {
+        series_id = g_current_parent_id;
+    }
     return load_items_for_parent_ex(item->id, item->name, item->type, series_id);
 }
 
@@ -1466,7 +1469,7 @@ static bool load_search_results(const char *query)
     for (;;) {
         char path[768];
         snprintf(path, sizeof(path),
-                 "/Users/%s/Items?SearchTerm=%s&Recursive=true&StartIndex=%d&Limit=%d&IncludeItemTypes=Movie,Series,Video,MusicVideo,BoxSet&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount&IsMissing=false&IsUnaired=false",
+                 "/Users/%s/Items?SearchTerm=%s&Recursive=true&StartIndex=%d&Limit=%d&IncludeItemTypes=Movie,Series,Video,MusicVideo,BoxSet&EnableImages=true&ImageTypeLimit=1&EnableUserData=false&EnableTotalRecordCount=true&Fields=Path,MediaSources,ParentId,Overview,PrimaryImageAspectRatio,ChildCount,RecursiveItemCount",
                  g_cfg.user_id, enc_query, start, ITEM_PAGE_SIZE);
 
         HttpResponse res;

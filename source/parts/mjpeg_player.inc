@@ -123,7 +123,7 @@ static s16 audio_limit_sample(int value)
 
     int over = magnitude - AUDIO_LIMIT_KNEE;
     int limited = AUDIO_LIMIT_KNEE +
-        (int)(((long long)over * AUDIO_LIMIT_HEADROOM) / (over + AUDIO_LIMIT_HEADROOM));
+        ((over * AUDIO_LIMIT_HEADROOM) / (over + AUDIO_LIMIT_HEADROOM));
     return clamp_s16(sign * limited);
 }
 
